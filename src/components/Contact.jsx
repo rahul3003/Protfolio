@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Mail, Send, MapPin, Phone } from 'lucide-react';
+import { Mail, Send, MapPin } from 'lucide-react';
 
 export default function Contact() {
     return (
@@ -26,7 +26,6 @@ export default function Contact() {
 
                         <div className="space-y-6 md:space-y-8">
                             <ContactMethod Icon={Mail} label="Email" value="rahulkhandke71@gmail.com" />
-                            <ContactMethod Icon={Phone} label="Phone" value="+91 7892655210" />
                             <ContactMethod Icon={MapPin} label="Location" value="Bangalore, India" />
                         </div>
                     </div>
