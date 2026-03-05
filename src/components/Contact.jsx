@@ -4,6 +4,20 @@ import { motion } from 'framer-motion';
 import { Mail, Send, MapPin } from 'lucide-react';
 
 export default function Contact() {
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const name = formData.get('name') || '';
+        const email = formData.get('email') || '';
+        const subject = formData.get('subject') || '';
+        const message = formData.get('message') || '';
+
+        const text = `Hi Rahul! 👋\n\nI am reaching out regarding *${subject}*.\n\n*Name:* ${name}\n*Email:* ${email}\n\n*Message:*\n${message}`;
+
+        // Add your phone number here, currently using a placeholder or default routing format
+        window.open(`https://api.whatsapp.com/send?phone=917892655210&text=${encodeURIComponent(text)}`, '_blank');
+    };
+
     return (
         <section id="contact" className="py-24 px-6 md:px-12 lg:px-24">
             <div className="max-w-6xl mx-auto glass rounded-[2.5rem] md:rounded-[4rem] p-8 md:p-16 lg:p-24 relative overflow-hidden border-white/5 shadow-2xl">
@@ -30,16 +44,18 @@ export default function Contact() {
                         </div>
                     </div>
 
-                    <form className="space-y-4 md:space-y-6 bg-white/[0.02] p-6 md:p-10 rounded-[2rem] border border-white/5 backdrop-blur-3xl">
+                    <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6 bg-white/[0.02] p-6 md:p-10 rounded-[2rem] border border-white/5 backdrop-blur-3xl">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                            <FormInput label="Full Name" type="text" placeholder="John Doe" />
-                            <FormInput label="Email Address" type="email" placeholder="john@example.com" />
+                            <FormInput label="Full Name" name="name" type="text" placeholder="John Doe" required />
+                            <FormInput label="Email Address" name="email" type="email" placeholder="john@example.com" required />
                         </div>
-                        <FormInput label="Subject" type="text" placeholder="Project Inquiry" />
+                        <FormInput label="Subject" name="subject" type="text" placeholder="Project Inquiry" required />
                         <div className="space-y-2">
                             <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-2">Message</label>
                             <textarea
+                                name="message"
                                 rows="4"
+                                required
                                 placeholder="Describe your vision..."
                                 className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-accent/50 transition-all resize-none text-white placeholder:text-gray-600 outline-none"
                             ></textarea>
@@ -61,12 +77,14 @@ export default function Contact() {
     );
 }
 
-function FormInput({ label, type, placeholder }) {
+function FormInput({ label, type, placeholder, name, required }) {
     return (
         <div className="space-y-2">
             <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-2">{label}</label>
             <input
                 type={type}
+                name={name}
+                required={required}
                 placeholder={placeholder}
                 className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-accent/50 transition-all text-white placeholder:text-gray-600 outline-none"
             />

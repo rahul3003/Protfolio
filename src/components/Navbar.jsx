@@ -60,6 +60,7 @@ export default function Navbar() {
                             <span className="absolute -bottom-1 left-0 w-0 h-px bg-accent transition-all group-hover:w-full" />
                         </motion.a>
                     ))}
+
                 </div>
 
                 <div className="hidden md:flex gap-4">
@@ -98,6 +99,7 @@ export default function Navbar() {
                                     {item}
                                 </motion.a>
                             ))}
+
                             <div className="flex gap-6 mt-8">
                                 <SocialIcon Icon={Github} href="https://github.com/rahul3003" title="GitHub" />
                                 <SocialIcon Icon={Linkedin} href="https://www.linkedin.com/in/rahul-khandke" title="LinkedIn" />
