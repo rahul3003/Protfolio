@@ -74,7 +74,7 @@ export default function Projects() {
                         Project <span className="text-gradient">Gallery.</span>
                     </motion.h2>
                     <p className="text-gray-400 max-w-2xl mx-auto text-lg md:text-2xl italic font-medium">
-                        Personal initiatives and technical deep-dives in modern web development.
+                        Internal Labs & Personal Projects. Deep-dives in modern web development.
                     </p>
                 </div>
 
