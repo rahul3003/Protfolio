@@ -1,140 +1,144 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ExternalLink, Github, ArrowUpRight, Terminal, Heart, ShoppingBag, Bus, Users, PlayCircle, Bot } from 'lucide-react';
+import { ExternalLink, Github, PlayCircle, Heart, Bot, ShoppingBag, Bus, Users } from 'lucide-react';
+import SectionHeader from '@/components/ui/SectionHeader';
+import { fadeUp, staggerContainer } from '@/lib/motion';
 
 const projects = [
     {
         title: 'Netflix Clone',
         category: 'Entertainment',
-        description: 'Leveraged React.js to build a dynamic and responsive UI that closely emulates Netflix. Created reusable components for homepage, movie details, and profiles.',
+        description: 'Dynamic responsive UI emulating Netflix with reusable components for homepage, movie details, and profiles.',
         tags: ['React', 'Firebase', 'TMDb API'],
         link: 'https://github.com/rahul3003',
         image: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?q=80&w=800&auto=format&fit=crop',
-        icon: PlayCircle
+        icon: PlayCircle,
     },
     {
         title: 'Doctor Chat App',
         category: 'Healthcare',
-        description: 'Built a real-time chat application facilitating seamless communication between doctors and patients using Stream Chat integration.',
+        description: 'Real-time chat between doctors and patients using Stream Chat integration.',
         tags: ['React', 'Stream Chat', 'Real-time'],
         link: 'https://github.com/rahul3003',
         image: 'https://images.unsplash.com/photo-1576091160550-2173599211d0?q=80&w=800&auto=format&fit=crop',
-        icon: Heart
+        icon: Heart,
     },
     {
         title: 'CodeX AI',
-        category: 'Artificial Intelligence',
-        description: 'Spearheaded the creation of CodeX, a feature-rich chat application integrating ChatGPT API for high-fidelity code generation and technical help.',
-        tags: ['Next.js', 'ChatGPT API', 'Node.js', 'Express'],
+        category: 'AI',
+        description: 'Feature-rich chat app integrating ChatGPT API for code generation and technical help.',
+        tags: ['Next.js', 'ChatGPT API', 'Node.js'],
         link: 'https://github.com/rahul3003',
         image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=800&auto=format&fit=crop',
-        icon: Bot
+        icon: Bot,
     },
     {
         title: 'Shopy E-commerce',
         category: 'E-commerce',
-        description: 'Architected an end-to-end e-commerce solution with dynamic product listings, secure checkout, and MongoDB database management.',
-        tags: ['Node.js', 'React', 'MongoDB', 'Bootstrap'],
+        description: 'End-to-end e-commerce with dynamic listings, secure checkout, and MongoDB.',
+        tags: ['Node.js', 'React', 'MongoDB'],
         link: 'https://github.com/rahul3003',
         image: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?q=80&w=800&auto=format&fit=crop',
-        icon: ShoppingBag
+        icon: ShoppingBag,
     },
     {
         title: 'KSRTC Tracking',
         category: 'Logistics',
-        description: 'Developed a comprehensive bus tracking system for KSRTC with real-time GPS location updates and arrival time predictions.',
-        tags: ['React', 'Node.js', 'GPS API', 'Real-time'],
+        description: 'Bus tracking system with real-time GPS updates and arrival predictions.',
+        tags: ['React', 'Node.js', 'GPS API'],
         link: 'https://github.com/rahul3003',
         image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=800&auto=format&fit=crop',
-        icon: Bus
+        icon: Bus,
     },
     {
         title: 'Studio HRMS',
         category: 'Enterprise',
-        description: 'Built a full-scale HRMS for employee management, onboarding, payroll, and performance tracking with role-based access control.',
-        tags: ['React', 'Node.js', 'Database Design', 'Auth'],
+        description: 'Full-scale HRMS for onboarding, payroll, and performance tracking with RBAC.',
+        tags: ['React', 'Node.js', 'Auth'],
         link: 'https://github.com/rahul3003',
         image: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=800&auto=format&fit=crop',
-        icon: Users
-    }
+        icon: Users,
+    },
 ];
 
 export default function Projects() {
     return (
-        <section id="projects" className="w-full py-32 px-6 md:px-12 lg:px-24 relative z-10 bg-black">
+        <section id="projects" className="section-padding px-6 md:px-12 lg:px-24 relative">
             <div className="max-w-7xl mx-auto">
-                <div className="mb-24 text-center">
-                    <motion.h2
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        className="text-5xl md:text-8xl font-black mb-6 tracking-tighter"
-                    >
-                        Project <span className="text-gradient">Gallery.</span>
-                    </motion.h2>
-                    <p className="text-gray-400 max-w-2xl mx-auto text-lg md:text-2xl italic font-medium">
-                        Internal Labs & Personal Projects. Deep-dives in modern web development.
-                    </p>
-                </div>
+                <SectionHeader
+                    eyebrow="Portfolio"
+                    title="Project"
+                    highlight="Gallery"
+                    description="Internal labs and personal projects — deep dives in modern web development."
+                    align="center"
+                    className="mx-auto"
+                />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-16">
-                    {projects.map((project, index) => (
-                        <ProjectCard key={index} project={project} index={index} />
+                <motion.div
+                    variants={staggerContainer}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: '-60px' }}
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                >
+                    {projects.map((project) => (
+                        <ProjectCard key={project.title} project={project} />
                     ))}
-                </div>
+                </motion.div>
             </div>
         </section>
     );
 }
 
-function ProjectCard({ project, index }) {
+function ProjectCard({ project }) {
     const Icon = project.icon;
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: index * 0.1 }}
-            className="group relative"
-        >
-            <div className="glass rounded-[3rem] overflow-hidden border border-white/10 bg-white/[0.02] flex flex-col h-full transition-all duration-500 hover:border-accent/40 hover:shadow-[0_40px_80px_rgba(139,92,246,0.15)]">
+        <motion.div variants={fadeUp} whileHover={{ y: -8 }} className="group h-full">
+            <div className="glass-card rounded-3xl overflow-hidden flex flex-col h-full">
                 <div className="relative aspect-[16/10] overflow-hidden">
-                    <img
+                    <motion.img
                         src={project.image}
                         alt={project.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-60 group-hover:opacity-100"
+                        className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-500"
+                        whileHover={{ scale: 1.08 }}
+                        transition={{ duration: 0.6 }}
                     />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-6 backdrop-blur-sm">
-                        <a href={project.link} target="_blank" rel="noopener noreferrer"
-                            className="p-5 bg-white text-black rounded-3xl hover:bg-accent hover:text-white transition-all transform hover:scale-110 shadow-2xl">
-                            <Github size={28} />
-                        </a>
-                        <a href={project.link} target="_blank" rel="noopener noreferrer"
-                            className="p-5 bg-white text-black rounded-3xl hover:bg-accent hover:text-white transition-all transform hover:scale-110 shadow-2xl">
-                            <ExternalLink size={28} />
-                        </a>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute top-4 left-4 p-2.5 glass rounded-xl text-accent border-white/10 group-hover:bg-accent group-hover:text-white transition-all duration-400">
+                        <Icon size={18} />
                     </div>
-                    {/* Floating Icon */}
-                    <div className="absolute top-6 left-6 p-4 glass rounded-2xl text-accent border-white/10 group-hover:border-accent group-hover:bg-accent group-hover:text-white transition-all duration-500 shadow-2xl">
-                        <Icon size={24} />
+                    <div className="absolute inset-0 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                        <motion.a
+                            href={project.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="p-3.5 bg-white text-black rounded-2xl hover:bg-accent hover:text-white transition-colors shadow-xl"
+                        >
+                            <Github size={20} />
+                        </motion.a>
+                        <motion.a
+                            href={project.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="p-3.5 bg-white text-black rounded-2xl hover:bg-accent hover:text-white transition-colors shadow-xl"
+                        >
+                            <ExternalLink size={20} />
+                        </motion.a>
                     </div>
                 </div>
 
-                <div className="p-10 flex flex-col flex-grow">
-                    <span className="text-accent text-xs font-black uppercase tracking-[0.3em] mb-3 inline-block">
-                        {project.category}
-                    </span>
-                    <h3 className="text-3xl md:text-4xl font-black mb-6 tracking-tight group-hover:text-accent transition-colors">
-                        {project.title}
-                    </h3>
-                    <p className="text-gray-500 text-sm mb-8 leading-relaxed font-sans line-clamp-3">
-                        {project.description}
-                    </p>
-
-                    <div className="flex flex-wrap gap-3 mt-auto">
-                        {project.tags.map(tag => (
-                            <span key={tag} className="px-5 py-2 bg-white/5 rounded-2xl text-[10px] text-gray-400 font-black border border-white/5 uppercase tracking-tighter hover:border-accent/30 hover:text-white transition-all">
+                <div className="p-6 flex flex-col flex-grow">
+                    <span className="text-accent text-[10px] font-black uppercase tracking-[0.25em] mb-2">{project.category}</span>
+                    <h3 className="text-xl font-black text-white mb-3 group-hover:text-accent transition-colors">{project.title}</h3>
+                    <p className="text-gray-500 text-sm leading-relaxed mb-5 line-clamp-2 flex-grow">{project.description}</p>
+                    <div className="flex flex-wrap gap-2">
+                        {project.tags.map((tag) => (
+                            <span key={tag} className="px-3 py-1 bg-white/5 rounded-lg text-[10px] text-gray-500 font-bold border border-white/5">
                                 {tag}
                             </span>
                         ))}

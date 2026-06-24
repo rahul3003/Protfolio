@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { motion, useSpring, AnimatePresence } from 'framer-motion';
+import { motion, useSpring } from 'framer-motion';
+
+const CURSOR_ZONE_SELECTOR = '.cursor-zone';
 
 export default function CustomCursor() {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const [isHovering, setIsHovering] = useState(false);
-    const [isVisible, setIsVisible] = useState(false);
+    const [isInZone, setIsInZone] = useState(false);
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -14,35 +16,44 @@ export default function CustomCursor() {
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         if (isMobile) return;
 
-        const mouseMove = (e) => {
-            if (!isVisible) setIsVisible(true);
-            setMousePosition({ x: e.clientX, y: e.clientY });
-        };
+        const isInsideZone = (target) => target?.closest?.(CURSOR_ZONE_SELECTOR);
 
-        const handleMouseOver = (e) => {
-            const target = e.target;
-            if (
-                target.tagName === 'A' ||
-                target.tagName === 'BUTTON' ||
-                target.closest('button') ||
-                target.closest('a')
-            ) {
-                setIsHovering(true);
-            } else {
-                setIsHovering(false);
+        const mouseMove = (e) => {
+            const inZone = !!isInsideZone(e.target);
+            setIsInZone(inZone);
+            if (inZone) {
+                setMousePosition({ x: e.clientX, y: e.clientY });
             }
         };
 
+        const handleMouseOver = (e) => {
+            if (!isInsideZone(e.target)) {
+                setIsHovering(false);
+                return;
+            }
+
+            const target = e.target;
+            setIsHovering(
+                target.tagName === 'A' ||
+                target.tagName === 'BUTTON' ||
+                !!target.closest('button') ||
+                !!target.closest('a')
+            );
+        };
+
+        const handleMouseLeave = () => setIsInZone(false);
+
         window.addEventListener('mousemove', mouseMove);
         window.addEventListener('mouseover', handleMouseOver);
+        document.documentElement.addEventListener('mouseleave', handleMouseLeave);
 
         return () => {
             window.removeEventListener('mousemove', mouseMove);
             window.removeEventListener('mouseover', handleMouseOver);
+            document.documentElement.removeEventListener('mouseleave', handleMouseLeave);
         };
-    }, [isVisible]);
+    }, []);
 
-    // Massive Galaxy Generation - Only generate after mount to avoid hydration mismatch
     const galaxySize = 25;
     const electrons = useMemo(() => {
         if (!mounted) return [];
@@ -56,13 +67,12 @@ export default function CustomCursor() {
         }));
     }, [mounted]);
 
-    if (!isVisible || !mounted) return null;
+    if (!mounted || !isInZone) return null;
 
     const cursorSize = isHovering ? 150 : 40;
 
     return (
         <div className="fixed inset-0 pointer-events-none z-[9999] hidden lg:block">
-            {/* Massive Nebula Glow */}
             <motion.div
                 className="fixed top-0 left-0 rounded-full blur-[80px] opacity-30 z-0"
                 animate={{
@@ -72,24 +82,22 @@ export default function CustomCursor() {
                     y: mousePosition.y - 150,
                     background: isHovering
                         ? 'radial-gradient(circle, #8b5cf6 0%, transparent 70%)'
-                        : 'radial-gradient(circle, #ec4899 0%, transparent 70%)'
+                        : 'radial-gradient(circle, #ec4899 0%, transparent 70%)',
                 }}
                 transition={{ type: 'spring', damping: 30, stiffness: 100 }}
             />
 
-            {/* Central Supernova Core */}
             <motion.div
                 className="fixed top-0 left-0 w-4 h-4 bg-white rounded-full z-50 shadow-[0_0_20px_#fff,0_0_40px_#8b5cf6,0_0_60px_#ec4899]"
                 animate={{
                     x: mousePosition.x - 8,
                     y: mousePosition.y - 8,
                     scale: isHovering ? 2 : 1,
-                    rotate: isHovering ? 180 : 0
+                    rotate: isHovering ? 180 : 0,
                 }}
                 transition={{ type: 'spring', damping: 20, stiffness: 300 }}
             />
 
-            {/* Galaxy Perimeter Ring */}
             <motion.div
                 className="fixed top-0 left-0 border border-white/20 rounded-full z-40 backdrop-blur-[2px]"
                 animate={{
@@ -102,10 +110,9 @@ export default function CustomCursor() {
                 }}
             />
 
-            {/* Continuous Rotating Galaxy System */}
             <motion.div
                 animate={{ rotate: 360 }}
-                transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
                 className="fixed top-0 left-0"
                 style={{ x: mousePosition.x, y: mousePosition.y }}
             >
@@ -119,7 +126,6 @@ export default function CustomCursor() {
                 ))}
             </motion.div>
 
-            {/* Trail of Light Particles */}
             <TrailingLight mouse={mousePosition} />
         </div>
     );
@@ -141,7 +147,7 @@ function OrbitingElectron({ config, mouse, isHovering }) {
         >
             <motion.div
                 animate={{ rotate: 360 }}
-                transition={{ duration: config.duration, repeat: Infinity, ease: "linear" }}
+                transition={{ duration: config.duration, repeat: Infinity, ease: 'linear' }}
                 style={{
                     width: config.radius * (isHovering ? 1.4 : 1) * 2,
                     height: config.radius * (isHovering ? 1.4 : 1) * 2,
@@ -150,7 +156,7 @@ function OrbitingElectron({ config, mouse, isHovering }) {
                 <motion.div
                     animate={{
                         scale: [1, 1.5, 1],
-                        opacity: [0.6, 1, 0.6]
+                        opacity: [0.6, 1, 0.6],
                     }}
                     transition={{ duration: 1 + Math.random(), repeat: Infinity }}
                     className="absolute top-0 left-1/2 -translate-x-1/2 rounded-full"

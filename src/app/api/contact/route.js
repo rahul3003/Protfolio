@@ -1,48 +1,96 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
+function escapeHtml(text = '') {
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 export async function POST(req) {
     try {
         const { name, email, subject, message } = await req.json();
 
-        // Use environment variables or fallback to provide a setup guide
-        const user = process.env.EMAIL_USER || 'enquiry@epsilon-engg.com';
-        const pass = process.env.EMAIL_PASS || 'qpxw tstz uatd kctt'; // This was mentioned in previous sessions
+        if (!name?.trim() || !email?.trim() || !subject?.trim() || !message?.trim()) {
+            return NextResponse.json(
+                { message: 'All fields are required.' },
+                { status: 400 }
+            );
+        }
+
+        if (!isValidEmail(email)) {
+            return NextResponse.json(
+                { message: 'Please enter a valid email address.' },
+                { status: 400 }
+            );
+        }
+
+        const user = process.env.EMAIL_USER;
+        const pass = process.env.EMAIL_PASS;
+        const recipient = process.env.EMAIL_TO || 'rahulkhandke71@gmail.com';
+
+        if (!user || !pass) {
+            console.error('SMTP credentials missing. Set EMAIL_USER and EMAIL_PASS in .env.local');
+            return NextResponse.json(
+                { message: 'Email service is not configured. Please try again later.' },
+                { status: 503 }
+            );
+        }
 
         const transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: process.env.SMTP_HOST || 'smtp.gmail.com',
+            port: Number(process.env.SMTP_PORT) || 587,
+            secure: process.env.SMTP_SECURE === 'true',
             auth: { user, pass },
         });
 
-        // Email to the user (Rahul)
+        await transporter.verify();
+
+        const safeName = escapeHtml(name.trim());
+        const safeEmail = escapeHtml(email.trim());
+        const safeSubject = escapeHtml(subject.trim());
+        const safeMessage = escapeHtml(message.trim()).replace(/\n/g, '<br>');
+
         const mailOptions = {
-            from: user,
-            to: 'rahulkhandke71@gmail.com',
-            subject: `New Project Inquiry: ${subject}`,
+            from: `"Portfolio Contact" <${user}>`,
+            to: recipient,
+            replyTo: email.trim(),
+            subject: `New Project Inquiry: ${subject.trim()}`,
             html: `
-                <div style="font-family: sans-serif; padding: 20px; color: #333; line-height: 1.6;">
-                    <h2 style="color: #8b5cf6;">New Project Inquiry! 🚀</h2>
-                    <p><strong>Name:</strong> ${name}</p>
-                    <p><strong>Email:</strong> ${email}</p>
-                    <p><strong>Subject:</strong> ${subject}</p>
-                    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-                    <p><strong>Message:</strong></p>
-                    <p style="background: #f9f9f9; padding: 15px; border-radius: 8px;">${message}</p>
+                <div style="font-family: 'Segoe UI', sans-serif; max-width: 560px; margin: 0 auto; padding: 32px; color: #1a1a1a; line-height: 1.6;">
+                    <div style="background: linear-gradient(135deg, #8b5cf6, #ec4899); padding: 24px; border-radius: 16px 16px 0 0;">
+                        <h2 style="color: #fff; margin: 0; font-size: 22px;">New Project Inquiry</h2>
+                    </div>
+                    <div style="background: #fafafa; padding: 28px; border: 1px solid #eee; border-top: none; border-radius: 0 0 16px 16px;">
+                        <p style="margin: 0 0 8px;"><strong>Name:</strong> ${safeName}</p>
+                        <p style="margin: 0 0 8px;"><strong>Email:</strong> <a href="mailto:${safeEmail}">${safeEmail}</a></p>
+                        <p style="margin: 0 0 20px;"><strong>Subject:</strong> ${safeSubject}</p>
+                        <div style="background: #fff; padding: 20px; border-radius: 12px; border-left: 4px solid #8b5cf6;">
+                            <p style="margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: #888;">Message</p>
+                            <p style="margin: 0;">${safeMessage}</p>
+                        </div>
+                    </div>
                 </div>
             `,
         };
 
-        // Automated Response to the Client
         const autoResponse = {
-            from: user,
-            to: email,
-            subject: `Thank you for reaching out, ${name}!`,
+            from: `"Rahul Khandke" <${user}>`,
+            to: email.trim(),
+            subject: `Thanks for reaching out, ${name.trim()}!`,
             html: `
-                <div style="font-family: sans-serif; padding: 20px; color: #333; line-height: 1.6;">
-                    <h2 style="color: #8b5cf6;">Hi ${name},</h2>
-                    <p>Thank you for reaching out! I've received your inquiry regarding "<strong>${subject}</strong>".</p>
-                    <p>I will review your message and get back to you as soon as possible.</p>
-                    <p>Best regards,<br><strong>Rahul Khandke</strong></p>
+                <div style="font-family: 'Segoe UI', sans-serif; max-width: 560px; margin: 0 auto; padding: 32px; color: #1a1a1a; line-height: 1.6;">
+                    <h2 style="color: #8b5cf6; margin-top: 0;">Hi ${safeName},</h2>
+                    <p>Thank you for reaching out! I've received your inquiry about <strong>"${safeSubject}"</strong>.</p>
+                    <p>I'll review your message and get back to you within 24 hours.</p>
+                    <p style="margin-bottom: 0;">Best regards,<br><strong>Rahul Khandke</strong></p>
                 </div>
             `,
         };
@@ -50,9 +98,20 @@ export async function POST(req) {
         await transporter.sendMail(mailOptions);
         await transporter.sendMail(autoResponse);
 
-        return NextResponse.json({ message: 'Success' }, { status: 200 });
+        return NextResponse.json(
+            { message: 'Message delivered successfully.', deliveredAt: new Date().toISOString() },
+            { status: 200 }
+        );
     } catch (error) {
-        console.error('Email API Error:', error);
-        return NextResponse.json({ message: 'Error', error: error.message }, { status: 500 });
+        console.error('SMTP Error:', error);
+        const isAuthError = error.code === 'EAUTH' || error.responseCode === 535;
+        return NextResponse.json(
+            {
+                message: isAuthError
+                    ? 'Email authentication failed. Check SMTP credentials.'
+                    : 'Failed to send message. Please try again.',
+            },
+            { status: 500 }
+        );
     }
 }

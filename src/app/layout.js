@@ -15,7 +15,7 @@ export default function RootLayout({ children }) {
             <head>
                 <link rel="icon" href="https://fav.farm/👨‍💻" />
             </head>
-            <body className={`${inter.className} antialiased selection:bg-accent selection:text-white bg-background text-foreground custom-cursor-active`}>
+            <body className={`${inter.className} antialiased selection:bg-accent selection:text-white bg-background text-foreground`}>
                 <CustomCursor />
                 {children}
             </body>
